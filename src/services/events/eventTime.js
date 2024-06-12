@@ -16,7 +16,6 @@ function getTimeTokens(formattedTime) {
 
 export function getLocalTime(date) {
   const formattedTime = dateFns.format(date, TIME_PATTERN);
-
   return getTimeTokens(formattedTime);
 }
 
@@ -30,6 +29,5 @@ export function getSkyTime(date) {
     US_PACIFIC_TIME_ZONE,
     TIME_PATTERN
   );
-
   return getTimeTokens(formattedTime);
 }

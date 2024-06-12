@@ -1,5 +1,3 @@
-// import { getFormattedSkyTime } from "./eventTime";
-
 export const eventNames = {
   GEYSER: "geyser",
   GRANDMA: "grandma",
@@ -8,6 +6,7 @@ export const eventNames = {
   FAIRY_RING: "fairyRing",
   FOREST_RAINBOW: "forestRainbow",
   DAILY_RESET: "dailyReset",
+  AVIARY_FIREWORKS: "aviaryFireworks",
   CONCERT_GRABSEATS: "grabSeats",
   CONCERT_STARTS: "concertStarts",
 };
@@ -15,11 +14,16 @@ export const eventNames = {
 export const eventTypes = {
   WAX: 0,
   ENVIRONMENT: 1,
-  RESET: 2,
+  MISCELLANEOUS: 2,
   CONCERT: 3,
 };
 
-export const eventTypeNames = ["Wax", "Environment", "Reset", "Aurora Concert"];
+export const eventTypeNames = [
+  "Wax",
+  "Environment",
+  "Miscellaneous",
+  "Aurora Concert",
+];
 
 const eventDefinitions = {
   [eventNames.GEYSER]: {
@@ -84,10 +88,22 @@ const eventDefinitions = {
   [eventNames.DAILY_RESET]: {
     name: "Daily Reset",
     key: eventNames.DAILY_RESET,
-    type: eventTypes.RESET,
+    type: eventTypes.MISCELLANEOUS,
     period: 24 * 60,
     hour: (hour) => 24 - hour,
     minute: (minute) => 0 - minute,
+  },
+  [eventNames.AVIARY_FIREWORKS]: {
+    name: "Aviary Fireworks",
+    key: eventNames.AVIARY_FIREWORKS,
+    type: eventTypes.MISCELLANEOUS,
+    period: 4 * 60,
+    hour: (hour) => (2 + hour) % 4,
+    minute: () => 0,
+    notification: {
+      body: "Aviary Fireworks will start in {t} minutes!",
+    },
+    month: (day) => (day === 1 ? 0 : 1),
   },
   [eventNames.CONCERT_GRABSEATS]: {
     name: "Grab Seats",
@@ -106,9 +122,6 @@ const eventDefinitions = {
     minute: (minute) => 10 - minute,
   },
 };
-
-// const getCurrentDay = (currentDate) =>
-//   parseInt(getFormattedSkyTime(currentDate, "i"));
 
 export { eventDefinitions };
 

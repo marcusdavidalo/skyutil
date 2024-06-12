@@ -1,63 +1,97 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getNextEvents } from "../services/events/eventsLogic";
+import { eventTypeNames } from "../services/events/eventData";
 
 const EventSchedules = () => {
-  const [events, setEvents] = useState([]);
+  const [groupedEvents, setGroupedEvents] = useState({});
+  const localTimeRef = useRef(null);
 
   useEffect(() => {
     const updateTime = () => {
       const currentDate = new Date();
       const nextEvents = getNextEvents(currentDate);
-      setEvents(nextEvents);
+      setGroupedEvents(nextEvents);
+      if (localTimeRef.current) {
+        localTimeRef.current.textContent = `Local Time: ${currentDate.toLocaleTimeString()}`;
+      }
     };
 
-    updateTime();
+    const update = () => {
+      updateTime();
+      requestAnimationFrame(update);
+    };
 
-    const intervalId = setInterval(updateTime, 1000);
+    update();
 
-    return () => clearInterval(intervalId);
+    return () => {
+      cancelAnimationFrame(update);
+    };
   }, []);
 
   return (
-    <div className="font-mono bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 md:p-6 lg:p-8">
-      <div className="flex font-bold justify-between items-center">
-        <h2 className="mb-4 text-3xl dark:text-white">Event Schedules</h2>
-        <h2 className="text-2xl font-thin text-gray-600 dark:text-gray-200 mb-4">
+    <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold mb-4 dark:text-white">
+          Event Schedules
+        </h2>
+        <h2
+          ref={localTimeRef}
+          className="text-2xl font-normal text-zinc-800 dark:text-zinc-200 mb-4 text-shadow-sm"
+        >
           Local Time: {new Date().toLocaleTimeString()}
         </h2>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead className="font-bold text-lg py-2">
-            <tr>
-              <th className=" text-left text-gray-600 dark:text-gray-200 uppercase tracking-wider">
-                Event Name
-              </th>
-              <th className=" text-left text-gray-600 dark:text-gray-200 uppercase tracking-wider">
-                Next Event
-              </th>
-              <th className=" text-left text-gray-600 dark:text-gray-200 uppercase tracking-wider">
-                Time to Next
-              </th>
-            </tr>
-          </thead>
-          <tbody className=" font-thin text-base">
-            {events.map((event) => (
-              <tr key={event.key}>
-                <td className="py-2 border-b border-gray-200 dark:border-gray-700">
-                  {event.name}
-                </td>
-                <td className="py-2 border-b border-gray-200 dark:border-gray-700">
-                  {String(event.hour).padStart(2, "0")}:
-                  {String(event.minute).padStart(2, "0")}
-                </td>
-                <td className="py-2 border-b border-gray-200 dark:border-gray-700">
-                  {event.hoursOffset}h {event.minutesOffset}m
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="space-y-6">
+        {Object.keys(groupedEvents).map((type) => (
+          <div
+            key={type}
+            className="bg-white/50 dark:bg-zinc-800/50 p-2 shadow-zinc-800/20 dark:shadow-zinc-200/20 shadow-md rounded-md w-full"
+          >
+            <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300 mb-2 text-center bg-zinc-400/50 dark:bg-zinc-900/50 p-2 rounded-md text-shadow-lg inset-2 shadow-inner shadow-zinc-800/20 dark:shadow-zinc-200/20">
+              {eventTypeNames[type]}
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse">
+                <thead className="font-bold text-lg py-2">
+                  <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider">
+                    <th>Event Name</th>
+                    <th>Next Event</th>
+                    <th>Time to Next</th>
+                  </tr>
+                </thead>
+                <tbody className="font-thin text-base text-shadow-md">
+                  {groupedEvents[type].map((event) => (
+                    <tr key={event.key}>
+                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {event.name}
+                      </td>
+                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {/* {event.name === "Aviary Fireworks" ? (
+                          "Work in Progress"
+                        ) : ( */}
+                        <>
+                          {String(event.hour).padStart(2, "0")}:
+                          {String(event.minute).padStart(2, "0")}
+                        </>
+                        {/* )} */}
+                      </td>
+                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {/* {event.name === "Aviary Fireworks" ? (
+                          "Work in Progress"
+                        ) : ( */}
+                        <>
+                          {event.hoursOffset}h {event.minutesOffset}m{" "}
+                          {String(event.second).padStart(2, "0")}s
+                        </>
+                        {/* )} */}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

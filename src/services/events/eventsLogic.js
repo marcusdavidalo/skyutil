@@ -3,14 +3,22 @@ import { getEventOffset } from "./eventTimeOffset";
 
 // Function to get all events with their next occurrence
 export function getNextEvents(currentDate) {
-  const events = Object.keys(eventDefinitions).map((eventKey) => {
+  const groupedEvents = {};
+
+  Object.keys(eventDefinitions).forEach((eventKey) => {
     const eventData = eventDefinitions[eventKey];
     const offset = getEventOffset(eventData, currentDate);
-    return {
+
+    const eventType = eventData.type;
+    if (!groupedEvents[eventType]) {
+      groupedEvents[eventType] = [];
+    }
+
+    groupedEvents[eventType].push({
       ...eventData,
       ...offset,
-    };
+    });
   });
 
-  return events;
+  return groupedEvents;
 }
