@@ -67,6 +67,7 @@ export function getEventOffset(eventData, currentDate) {
   return {
     date: nextEventDate,
     minutesToNextEvent,
+    totalSecondsToNextEvent, // Added total seconds to next event for sorting
     daysOffset,
     hoursOffset,
     minutesOffset,
