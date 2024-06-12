@@ -1,6 +1,6 @@
 import { add } from "date-fns";
 import { getLocalTime, getSkyTime } from "./eventTime";
-import { eventNames } from "./eventData"; // Import eventNames
+import { eventNames } from "./eventData";
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -12,7 +12,7 @@ function getDaysToNextMonth(currentDate) {
   const day = currentDate.getDate();
 
   const daysInMonth = getDaysInMonth(year, month);
-  return daysInMonth - day + 1; // Days remaining in this month
+  return daysInMonth - day; // Days remaining in this month
 }
 
 export function getMinutesToNextEvent(currentDate, eventData) {
@@ -24,7 +24,13 @@ export function getMinutesToNextEvent(currentDate, eventData) {
 
     if (!isEventDay) {
       const daysToNextMonth = getDaysToNextMonth(currentDate);
-      return daysToNextMonth * 24 * 60; // Minutes to next first of the month
+      return (daysToNextMonth + 1) * 24 * 60;
+    } else {
+      const currentHour = currentDate.getHours();
+      const nextEventHour = Math.ceil(currentHour / 4) * 4;
+      const hoursToNextEvent = nextEventHour - currentHour;
+
+      return hoursToNextEvent * 60 - minute;
     }
   }
 
@@ -47,23 +53,27 @@ export function getMinutesToNextEvent(currentDate, eventData) {
 
 export function getEventOffset(eventData, currentDate) {
   const minutesToNextEvent = getMinutesToNextEvent(currentDate, eventData);
-
   const totalSecondsToNextEvent = Math.floor(minutesToNextEvent * 60);
-  const hoursOffset = Math.floor(totalSecondsToNextEvent / 3600);
+  const totalHoursToNextEvent = Math.floor(totalSecondsToNextEvent / 3600);
+  const daysOffset = Math.floor(totalHoursToNextEvent / 24);
+  const hoursOffset = totalHoursToNextEvent % 24;
   const minutesOffset = Math.floor((totalSecondsToNextEvent % 3600) / 60);
-  const secondsOffset = totalSecondsToNextEvent % 60;
 
   const nextEventDate = add(currentDate, { seconds: totalSecondsToNextEvent });
-  const { hour, minute, second } = getLocalTime(nextEventDate);
+  const localTime = getLocalTime(nextEventDate);
+
+  const { day, hour, minute, second } = localTime;
 
   return {
     date: nextEventDate,
     minutesToNextEvent,
+    daysOffset,
     hoursOffset,
     minutesOffset,
-    secondsOffset,
+    day,
     hour,
     minute,
     second: 60 - second,
+    isAviaryEventDay: currentDate.getDate() === 1, // Flag for displaying day information
   };
 }
