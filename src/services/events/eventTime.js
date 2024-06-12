@@ -3,10 +3,10 @@ const dateFns = require("date-fns");
 
 const US_PACIFIC_TIME_ZONE = "America/Los_Angeles";
 const TIME_PATTERN = "HH:mm:ss";
+const DATE_PATTERN = "yyyy-MM-dd";
 
 function getTimeTokens(formattedTime) {
   const [hour, minute, second] = formattedTime.split(":");
-
   return {
     hour: parseInt(hour),
     minute: parseInt(minute),
@@ -14,9 +14,22 @@ function getTimeTokens(formattedTime) {
   };
 }
 
+function getDateTokens(formattedDate) {
+  const [year, month, day] = formattedDate.split("-");
+  return {
+    year: parseInt(year),
+    month: parseInt(month),
+    day: parseInt(day),
+  };
+}
+
 export function getLocalTime(date) {
   const formattedTime = dateFns.format(date, TIME_PATTERN);
-  return getTimeTokens(formattedTime);
+  const formattedDate = dateFns.format(date, DATE_PATTERN);
+  const timeTokens = getTimeTokens(formattedTime);
+  const dateTokens = getDateTokens(formattedDate);
+
+  return { ...timeTokens, ...dateTokens };
 }
 
 export function getFormattedSkyTime(date, formatString) {
