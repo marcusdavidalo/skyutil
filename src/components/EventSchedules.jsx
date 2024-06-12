@@ -5,6 +5,20 @@ import { eventTypeNames } from "../services/events/eventData";
 const EventSchedules = () => {
   const [groupedEvents, setGroupedEvents] = useState({});
   const localTimeRef = useRef(null);
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   useEffect(() => {
     const updateTime = () => {
@@ -66,24 +80,29 @@ const EventSchedules = () => {
                         {event.name}
                       </td>
                       <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {/* {event.name === "Aviary Fireworks" ? (
-                          "Work in Progress"
-                        ) : ( */}
-                        <>
-                          {String(event.hour).padStart(2, "0")}:
-                          {String(event.minute).padStart(2, "0")}
-                        </>
-                        {/* )} */}
+                        {event.name === "Aviary Fireworks" &&
+                        !event.isAviaryEventDay ? (
+                          <>
+                            {monthNames[event.date.getMonth()]}{" "}
+                            {event.date.getDate()}{" "}
+                          </>
+                        ) : (
+                          <>
+                            {String(event.hour).padStart(2, "0")}:
+                            {String(event.minute).padStart(2, "0")}
+                          </>
+                        )}
                       </td>
                       <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {/* {event.name === "Aviary Fireworks" ? (
-                          "Work in Progress"
-                        ) : ( */}
-                        <>
-                          {event.hoursOffset}h {event.minutesOffset}m{" "}
-                          {String(event.second).padStart(2, "0")}s
-                        </>
-                        {/* )} */}
+                        {event.name === "Aviary Fireworks" &&
+                        !event.isAviaryEventDay ? (
+                          <>{event.daysOffset} days</>
+                        ) : (
+                          <>
+                            {event.hoursOffset}h {event.minutesOffset}m{" "}
+                            {event.second}s
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}
