@@ -98,12 +98,17 @@ const eventDefinitions = {
     key: eventNames.AVIARY_FIREWORKS,
     type: eventTypes.MISCELLANEOUS,
     period: 4 * 60,
-    hour: (hour) => (2 + hour) % 4,
+    hour: (hour) => hour % 4,
     minute: () => 0,
     notification: {
       body: "Aviary Fireworks will start in {t} minutes!",
     },
     month: (day) => (day === 1 ? 0 : 1),
+    day: (date) => {
+      // Handle day and month logic
+      const day = date.getDate();
+      return day === 1 ? 0 : 1;
+    },
   },
   [eventNames.CONCERT_GRABSEATS]: {
     name: "Grab Seats",
