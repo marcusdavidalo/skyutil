@@ -20,5 +20,12 @@ export function getNextEvents(currentDate) {
     });
   });
 
+  // Sort events in each group
+  Object.keys(groupedEvents).forEach((type) => {
+    groupedEvents[type].sort(
+      (a, b) => a.totalSecondsToNextEvent - b.totalSecondsToNextEvent
+    );
+  });
+
   return groupedEvents;
 }
