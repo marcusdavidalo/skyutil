@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import EventSchedules from "./components/EventSchedules";
 import ShardSchedules from "./components/ShardSchedules";
 import InteractiveMap from "./components/InteractiveMap";
@@ -19,7 +19,18 @@ const ThemeToggle = () => {
 };
 
 const App = () => {
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString()
+  );
   const localTimeRef = useRef(null);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <>
       <img
@@ -36,7 +47,7 @@ const App = () => {
                 ref={localTimeRef}
                 className="text-2xl font-normal text-zinc-800 dark:text-zinc-200 mb-4 text-shadow-sm"
               >
-                Local Time: {new Date().toLocaleTimeString()}
+                Local Time: {currentTime}
               </h2>
               <ThemeToggle />
             </header>
