@@ -39,7 +39,13 @@ const ShardSchedules = () => {
     if (haveShard) {
       setTodayShardEvent({
         ...shardInfo,
-        occurrences: occurrences,
+        occurrences: occurrences.map((occurrence) => ({
+          start: DateTime.fromISO(occurrence.start).setZone(
+            currentDate.zoneName
+          ),
+          land: DateTime.fromISO(occurrence.land).setZone(currentDate.zoneName),
+          end: DateTime.fromISO(occurrence.end).setZone(currentDate.zoneName),
+        })),
         timeZone: currentDate.zoneName,
       });
     }
@@ -89,19 +95,13 @@ const ShardSchedules = () => {
                       {idx + 1}
                     </td>
                     <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.start
-                        .setZone(timeZone)
-                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                      {occurrence.start.toLocaleString(DateTime.TIME_SIMPLE)}
                     </td>
                     <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.land
-                        .setZone(timeZone)
-                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                      {occurrence.land.toLocaleString(DateTime.TIME_SIMPLE)}
                     </td>
                     <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.end
-                        .setZone(timeZone)
-                        .toLocaleString(DateTime.TIME_SIMPLE)}
+                      {occurrence.end.toLocaleString(DateTime.TIME_SIMPLE)}
                     </td>
                   </tr>
                 ))}
