@@ -82,10 +82,10 @@ const ShardSchedules = () => {
           </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse">
-              <thead className="font-bold text-lg py-2">
-                <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider">
+              <thead className="font-bold text-xs sm:text-sm md:text-md lg:text-lg py-2">
+                <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider text-wrap">
                   <th className="p-2 md:p-4">Occurrence</th>
-                  <th className="p-2 md:p-4">Start Time</th>
+                  {/* <th className="p-2 md:p-4">Start Time</th> */}
                   <th className="p-2 md:p-4">Land Time</th>
                   <th className="p-2 md:p-4">End Time</th>
                 </tr>
@@ -111,9 +111,9 @@ const ShardSchedules = () => {
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {"Shard " + (idx + 1)}
                       </td>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                      {/* <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {occurrence.start.toLocaleString(DateTime.TIME_SIMPLE)}
-                      </td>
+                      </td> */}
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {occurrence.land.toLocaleString(DateTime.TIME_SIMPLE)}
                       </td>

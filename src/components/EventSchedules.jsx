@@ -60,8 +60,8 @@ const EventSchedules = () => {
             </h3>
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse md:table">
-                <thead className="font-bold text-lg py-2">
-                  <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider">
+                <thead className="font-bold text-xs sm:text-sm md:text-md lg:text-lg py-2">
+                  <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider text-wrap">
                     <th className="p-2">Event Name</th>
                     <th className="p-2">Next Event</th>
                     <th className="p-2">Time to Next</th>
