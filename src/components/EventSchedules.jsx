@@ -59,21 +59,21 @@ const EventSchedules = () => {
               {eventTypeNames[type]}
             </h3>
             <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse">
+              <table className="min-w-full border-collapse md:table">
                 <thead className="font-bold text-lg py-2">
                   <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider">
-                    <th>Event Name</th>
-                    <th>Next Event</th>
-                    <th>Time to Next</th>
+                    <th className="p-2">Event Name</th>
+                    <th className="p-2">Next Event</th>
+                    <th className="p-2">Time to Next</th>
                   </tr>
                 </thead>
                 <tbody className="font-thin text-base text-shadow-md">
                   {groupedEvents[type].map((event) => (
                     <tr key={event.key}>
-                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {event.name}
                       </td>
-                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {event.name === "Aviary Fireworks" &&
                         !event.isAviaryEventDay ? (
                           <>
@@ -87,7 +87,7 @@ const EventSchedules = () => {
                           </>
                         )}
                       </td>
-                      <td className="py-2 border-b border-zinc-200 dark:border-zinc-700">
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {event.name === "Aviary Fireworks" &&
                         !event.isAviaryEventDay ? (
                           <>{event.daysOffset} days</>

@@ -41,16 +41,21 @@ const App = () => {
       <ThemeProvider>
         <div className="w-full bg-zinc-100/50 text-zinc-900 dark:bg-zinc-950/50  dark:text-zinc-200 min-h-screen ">
           <div className="container mx-auto p-4">
-            <header className="mb-8 flex justify-between items-center bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 px-4 md:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold text-shadow-sm">Sky Utils</h1>
-              <h2
-                ref={localTimeRef}
-                className="text-2xl font-normal text-zinc-800 dark:text-zinc-200 mb-4 text-shadow-sm"
-              >
-                Local Time: {currentTime}
-              </h2>
+            <header className="mb-8 flex flex-col md:flex-row justify-between items-center bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 px-4 md:px-6 lg:px-8 py-4">
+              <div className="flex items-center mb-2 md:mb-0">
+                <h1 className="text-3xl md:text-4xl font-bold text-shadow-sm">
+                  Sky Utils
+                </h1>
+                <h2
+                  ref={localTimeRef}
+                  className="text-lg md:text-2xl font-normal text-zinc-800 dark:text-zinc-200 ml-4 text-shadow-sm"
+                >
+                  Local Time: {currentTime}
+                </h2>
+              </div>
               <ThemeToggle />
             </header>
+
             <main>
               <section className="flex flex-col lg:flex-row justify-evenly w-full gap-4 mb-8">
                 <aside className="w-full lg:w-1/2" id="event-schedules">
