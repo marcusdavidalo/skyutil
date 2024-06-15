@@ -66,6 +66,8 @@ const ShardSchedules = () => {
   }[realm];
   const fullMapName = mapLocation(map);
 
+  const currentTime = DateTime.local();
+
   return (
     <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
       <div className="flex justify-between items-center">
@@ -79,32 +81,54 @@ const ShardSchedules = () => {
             {`${shardType} - ${fullRealmName} - ${fullMapName}`}
           </h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse md:table">
+            <table className="min-w-full border-collapse">
               <thead className="font-bold text-lg py-2">
                 <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider">
-                  <th className="p-2">Occurrence</th>
-                  <th className="p-2">Start Time</th>
-                  <th className="p-2">Land Time</th>
-                  <th className="p-2">End Time</th>
+                  <th className="p-2 md:p-4">Occurrence</th>
+                  <th className="p-2 md:p-4">Start Time</th>
+                  <th className="p-2 md:p-4">Land Time</th>
+                  <th className="p-2 md:p-4">End Time</th>
                 </tr>
               </thead>
               <tbody className="font-thin text-base text-shadow-md">
-                {occurrences.map((occurrence, idx) => (
-                  <tr key={idx}>
-                    <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {idx + 1}
-                    </td>
-                    <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.start.toLocaleString(DateTime.TIME_SIMPLE)}
-                    </td>
-                    <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.land.toLocaleString(DateTime.TIME_SIMPLE)}
-                    </td>
-                    <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                      {occurrence.end.toLocaleString(DateTime.TIME_SIMPLE)}
-                    </td>
-                  </tr>
-                ))}
+                {occurrences.map((occurrence, idx) => {
+                  const startTime = occurrence.start;
+                  const endTime = occurrence.end;
+                  const totalDuration = endTime.diff(
+                    startTime,
+                    "seconds"
+                  ).seconds;
+                  const elapsedDuration =
+                    currentTime > endTime
+                      ? totalDuration
+                      : currentTime < startTime
+                      ? 0
+                      : currentTime.diff(startTime, "seconds").seconds;
+                  const progress = (elapsedDuration / totalDuration) * 100;
+
+                  return (
+                    <tr key={idx} className="relative">
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {"Shard " + (idx + 1)}
+                      </td>
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {occurrence.start.toLocaleString(DateTime.TIME_SIMPLE)}
+                      </td>
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {occurrence.land.toLocaleString(DateTime.TIME_SIMPLE)}
+                      </td>
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {occurrence.end.toLocaleString(DateTime.TIME_SIMPLE)}
+                      </td>
+                      <div
+                        className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 ${
+                          progress < 100 ? "rounded-r-full" : ""
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
