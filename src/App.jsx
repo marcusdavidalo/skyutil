@@ -1,6 +1,6 @@
-import React from "react";
+import { useRef } from "react";
 import EventSchedules from "./components/EventSchedules";
-import ShardEvents from "./components/ShardEvents";
+import ShardSchedules from "./components/ShardSchedules";
 import InteractiveMap from "./components/InteractiveMap";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import bg from "./assets/bg.png";
@@ -19,6 +19,7 @@ const ThemeToggle = () => {
 };
 
 const App = () => {
+  const localTimeRef = useRef(null);
   return (
     <>
       <img
@@ -31,6 +32,12 @@ const App = () => {
           <div className="container mx-auto p-4">
             <header className="mb-8 flex justify-between items-center bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 px-4 md:px-6 lg:px-8">
               <h1 className="text-3xl font-bold text-shadow-sm">Sky Utils</h1>
+              <h2
+                ref={localTimeRef}
+                className="text-2xl font-normal text-zinc-800 dark:text-zinc-200 mb-4 text-shadow-sm"
+              >
+                Local Time: {new Date().toLocaleTimeString()}
+              </h2>
               <ThemeToggle />
             </header>
             <main>
@@ -39,7 +46,7 @@ const App = () => {
                   <EventSchedules />
                 </aside>
                 <aside className="w-full lg:w-1/2" id="shard-events">
-                  <ShardEvents />
+                  <ShardSchedules />
                 </aside>
               </section>
               <section id="interactive-map" className="mb-8">

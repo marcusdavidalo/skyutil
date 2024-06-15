@@ -48,12 +48,6 @@ const EventSchedules = () => {
         <h2 className="text-3xl font-bold mb-4 dark:text-white">
           Event Schedules
         </h2>
-        <h2
-          ref={localTimeRef}
-          className="text-2xl font-normal text-zinc-800 dark:text-zinc-200 mb-4 text-shadow-sm"
-        >
-          Local Time: {new Date().toLocaleTimeString()}
-        </h2>
       </div>
       <div className="space-y-6">
         {Object.keys(groupedEvents).map((type) => (
