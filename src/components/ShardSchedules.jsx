@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { findNextShard } from "../services/shards/shardsLogic";
-import { DateTime } from "luxon";
+import { DateTime, Settings } from "luxon";
 
 const mapLocation = (key) => {
   const locationMap = {
@@ -30,16 +30,17 @@ const mapLocation = (key) => {
 
 const ShardSchedules = () => {
   const [todayShardEvent, setTodayShardEvent] = useState(null);
+  const [message, setMessage] = useState("Loading...");
+  const localZone = Settings.defaultZoneName;
 
   useEffect(() => {
-    const currentDate = DateTime.local();
+    const currentDate = DateTime.local().setZone("America/Los_Angeles");
     const shardInfo = findNextShard(currentDate);
-    const { occurrences, haveShard } = shardInfo;
 
-    if (haveShard) {
+    if (shardInfo.hasShard) {
       setTodayShardEvent({
         ...shardInfo,
-        occurrences: occurrences.map((occurrence) => ({
+        occurrences: shardInfo.occurrences.map((occurrence) => ({
           start: DateTime.fromISO(occurrence.start).setZone(
             currentDate.zoneName
           ),
@@ -48,11 +49,26 @@ const ShardSchedules = () => {
         })),
         timeZone: currentDate.zoneName,
       });
+      setMessage(null);
+    } else {
+      setTodayShardEvent({
+        hasShard: false,
+        date: currentDate,
+        timeZone: currentDate.zoneName,
+      });
+      setMessage("No shards today.");
     }
   }, []);
 
-  if (!todayShardEvent) {
-    return <div>No shards today.</div>;
+  if (!todayShardEvent.hasShard) {
+    return (
+      <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
+        <h2 className="text-3xl font-bold mb-4 dark:text-white">
+          Today's Shard Schedule
+        </h2>
+        <p className="text-lg text-zinc-800 dark:text-zinc-200">{message}</p>
+      </div>
+    );
   }
 
   const { realm, map, occurrences, isRed } = todayShardEvent;
@@ -85,15 +101,15 @@ const ShardSchedules = () => {
               <thead className="font-bold text-xs sm:text-sm md:text-md lg:text-lg py-2">
                 <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider text-wrap">
                   <th className="p-2 md:p-4">Occurrence</th>
-                  {/* <th className="p-2 md:p-4">Start Time</th> */}
                   <th className="p-2 md:p-4">Land Time</th>
                   <th className="p-2 md:p-4">End Time</th>
                 </tr>
               </thead>
               <tbody className="font-thin text-base text-shadow-md">
                 {occurrences.map((occurrence, idx) => {
-                  const startTime = occurrence.start;
-                  const endTime = occurrence.end;
+                  const startTime = occurrence.start.setZone(localZone);
+                  const endTime = occurrence.end.setZone(localZone);
+                  const landTime = occurrence.land.setZone(localZone);
                   const totalDuration = endTime.diff(
                     startTime,
                     "seconds"
@@ -111,17 +127,14 @@ const ShardSchedules = () => {
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {"Shard " + (idx + 1)}
                       </td>
-                      {/* <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {occurrence.start.toLocaleString(DateTime.TIME_SIMPLE)}
-                      </td> */}
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {occurrence.land.toLocaleString(DateTime.TIME_SIMPLE)}
+                        {landTime.toLocaleString(DateTime.TIME_SIMPLE)}
                       </td>
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {occurrence.end.toLocaleString(DateTime.TIME_SIMPLE)}
+                        {endTime.toLocaleString(DateTime.TIME_SIMPLE)}
                       </td>
                       <div
-                        className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 ${
+                        className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
                           progress < 100 ? "rounded-r-full" : ""
                         }`}
                         style={{ width: `${progress}%` }}
