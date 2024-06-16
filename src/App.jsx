@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import EventSchedules from "./components/EventSchedules";
-import ShardSchedules from "./components/ShardSchedules";
+import ShardCarousel from "./components/ShardCarousel";
 import InteractiveMap from "./components/InteractiveMap";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import bg from "./assets/bg.png";
@@ -62,7 +62,7 @@ const App = () => {
                   <EventSchedules />
                 </aside>
                 <aside className="w-full lg:w-1/2" id="shard-events">
-                  <ShardSchedules />
+                  <ShardCarousel />
                 </aside>
               </section>
               <section id="interactive-map" className="mb-8">

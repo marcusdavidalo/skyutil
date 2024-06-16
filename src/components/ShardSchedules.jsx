@@ -28,13 +28,13 @@ const mapLocation = (key) => {
   return locationMap[key] || key;
 };
 
-const ShardSchedules = () => {
-  const [todayShardEvent, setTodayShardEvent] = useState(null);
-  const [message, setMessage] = useState("Loading...");
+const ShardSchedules = ({ date, title }) => {
+  const [todayShardEvent, setTodayShardEvent] = useState({ hasShard: false });
+  const [message, setMessage] = useState("");
   const localZone = Settings.defaultZoneName;
 
   useEffect(() => {
-    const currentDate = DateTime.local().setZone("America/Los_Angeles");
+    const currentDate = date || DateTime.local().setZone("America/Los_Angeles");
     const shardInfo = findNextShard(currentDate);
 
     if (shardInfo.hasShard) {
@@ -56,15 +56,15 @@ const ShardSchedules = () => {
         date: currentDate,
         timeZone: currentDate.zoneName,
       });
-      setMessage("No shards today.");
+      setMessage(`No shards ${title}`);
     }
-  }, []);
+  }, [date, title]);
 
   if (!todayShardEvent.hasShard) {
     return (
-      <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
+      <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8 h-full w-full">
         <h2 className="text-3xl font-bold mb-4 dark:text-white">
-          Today's Shard Schedule
+          Shard Schedule {title}
         </h2>
         <p className="text-lg text-zinc-800 dark:text-zinc-200">{message}</p>
       </div>
@@ -83,26 +83,32 @@ const ShardSchedules = () => {
   const fullMapName = mapLocation(map);
 
   const currentTime = DateTime.local();
-
+  const shardTypeClass = isRed
+    ? "bg-red-600/20"
+    : "bg-zinc-400/50 dark:bg-zinc-900/50";
   return (
-    <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
+    <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8 w-full">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold mb-4 dark:text-white">
-          Today's Shard Schedule
+          Shard Schedule {title}
         </h2>
       </div>
       <div className="space-y-6">
-        <div className="bg-white/50 dark:bg-zinc-800/50 p-2 shadow-zinc-800/20 dark:shadow-zinc-200/20 shadow-md rounded-md w-full">
-          <h3 className="text-xl font-semibold text-zinc-800 dark:text-zinc-300 mb-2 text-center bg-zinc-400/50 dark:bg-zinc-900/50 p-2 rounded-md text-shadow-lg inset-2 shadow-inner shadow-zinc-800/20 dark:shadow-zinc-200/20">
+        <div
+          className={`bg-white/50 dark:bg-zinc-800/50 p-2 shadow-zinc-800/20 dark:shadow-zinc-200/20 shadow-md rounded-md w-full`}
+        >
+          <h3
+            className={`text-xl font-semibold mb-2 text-center p-2 rounded-md inset-2 shadow-inner shadow-zinc-800/20 dark:shadow-zinc-200/20 ${shardTypeClass}`}
+          >
             {`${shardType} - ${fullRealmName} - ${fullMapName}`}
           </h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse">
+            <table className="min-w-full border-collapse md:table">
               <thead className="font-bold text-xs sm:text-sm md:text-md lg:text-lg py-2">
                 <tr className="text-zinc-800 dark:text-zinc-200 text-left uppercase tracking-wider text-wrap">
-                  <th className="p-2 md:p-4">Occurrence</th>
-                  <th className="p-2 md:p-4">Land Time</th>
-                  <th className="p-2 md:p-4">End Time</th>
+                  <th className="p-2">Occurrence</th>
+                  <th className="p-2 text-center">Land Time</th>
+                  <th className="p-2 text-end">End Time</th>
                 </tr>
               </thead>
               <tbody className="font-thin text-base text-shadow-md">
