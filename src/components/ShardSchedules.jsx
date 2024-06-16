@@ -122,6 +122,19 @@ const ShardSchedules = () => {
                       : currentTime.diff(startTime, "seconds").seconds;
                   const progress = (elapsedDuration / totalDuration) * 100;
 
+                  if (currentTime > endTime) {
+                    return (
+                      <tr key={idx}>
+                        <td
+                          colSpan="3"
+                          className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
+                        >
+                          {"Shard " + (idx + 1)} Ended
+                        </td>
+                      </tr>
+                    );
+                  }
+
                   return (
                     <tr key={idx} className="relative">
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
