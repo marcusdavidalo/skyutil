@@ -1,6 +1,5 @@
 import { add } from "date-fns";
 import { getLocalTime, getSkyTime } from "./eventTime";
-import { eventNames } from "./eventData";
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();

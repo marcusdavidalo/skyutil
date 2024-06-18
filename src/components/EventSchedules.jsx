@@ -3,6 +3,8 @@ import { getNextEvents } from "../services/events/eventsLogic";
 import { eventTypeNames } from "../services/events/eventData";
 import { monthNames } from "../utils/monthNames";
 
+import { DateTime } from "luxon";
+
 const EventSchedules = () => {
   const [groupedEvents, setGroupedEvents] = useState({});
   const localTimeRef = useRef(null);
@@ -22,11 +24,14 @@ const EventSchedules = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  function formatTime(hour, minute) {
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const adjustedHour = hour % 12 === 0 ? 12 : hour % 12;
+  function formatTime(hour, minute, duration) {
+    const startTime = DateTime.local().set({ hour, minute });
+    const endTime = startTime.plus({ minutes: duration });
 
-    return `${adjustedHour}:${String(minute).padStart(2, "0")} ${ampm}`;
+    const startTimeString = startTime.toLocaleString(DateTime.TIME_SIMPLE);
+    const endTimeString = endTime.toLocaleString(DateTime.TIME_SIMPLE);
+
+    return `${startTimeString} - ${endTimeString}`;
   }
 
   return (
@@ -55,34 +60,67 @@ const EventSchedules = () => {
                   </tr>
                 </thead>
                 <tbody className="font-thin text-base text-shadow-md">
-                  {groupedEvents[type].map((event) => (
-                    <tr key={event.key}>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.name}
-                      </td>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.isMonthly ? (
-                          <>
-                            {monthNames[event.date.getMonth()]}{" "}
-                            {event.date.getDate()}{" "}
-                          </>
-                        ) : (
-                          <>{formatTime(event.hour, event.minute)}</>
-                        )}
-                      </td>
+                  {groupedEvents[type].map((event) => {
+                    const currentTime = DateTime.local();
+                    const startTime = DateTime.local().set({
+                      hour: event.hour,
+                      minute: event.minute,
+                    });
+                    const endTime = startTime.plus({
+                      minutes: event.duration || 0,
+                    });
+                    const nextEventTime =
+                      currentTime > endTime
+                        ? startTime.plus({ minutes: event.period })
+                        : null;
 
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.isMonthly ? (
-                          <>{event.daysOffset} days</>
-                        ) : (
-                          <>
-                            {event.hoursOffset}h {event.minutesOffset}m{" "}
-                            {event.second}s
-                          </>
+                    const totalDuration = endTime.diff(
+                      startTime,
+                      "seconds"
+                    ).seconds;
+                    const elapsedDuration =
+                      currentTime < startTime
+                        ? 0
+                        : currentTime.diff(startTime, "seconds").seconds;
+                    const progress = (elapsedDuration / totalDuration) * 100;
+
+                    return (
+                      <tr key={event.key} className="relative">
+                        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                          {event.name}
+                        </td>
+                        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                          {currentTime > endTime && nextEventTime
+                            ? nextEventTime.toLocaleString(DateTime.TIME_SIMPLE)
+                            : event.duration
+                            ? formatTime(
+                                event.hour,
+                                event.minute,
+                                event.duration
+                              )
+                            : startTime.toLocaleString(DateTime.TIME_SIMPLE)}
+                        </td>
+                        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                          {event.isMonthly ? (
+                            <>{event.daysOffset} days</>
+                          ) : (
+                            <>
+                              {event.hoursOffset}h {event.minutesOffset}m{" "}
+                              {event.second}s
+                            </>
+                          )}
+                        </td>
+                        {event.duration && currentTime < endTime && (
+                          <div
+                            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
+                              progress < 100 ? "rounded-r-full" : ""
+                            }`}
+                            style={{ width: `${progress}%` }}
+                          />
                         )}
-                      </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

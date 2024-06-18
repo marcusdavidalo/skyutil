@@ -34,6 +34,7 @@ const eventDefinitions = {
     hour: (hour) => hour % 2,
     minute: (minute) => 5 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.GRANDMA]: {
     name: "Grandma",
@@ -43,6 +44,7 @@ const eventDefinitions = {
     hour: (hour) => hour % 2,
     minute: (minute) => 35 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.TURTLE]: {
     name: "Turtle",
@@ -52,6 +54,7 @@ const eventDefinitions = {
     hour: (hour) => hour % 2,
     minute: (minute) => 50 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.SUNSET]: {
     name: "Sunset",
@@ -61,6 +64,7 @@ const eventDefinitions = {
     hour: (hour) => hour % 2,
     minute: (minute) => 50 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.FAIRY_RING]: {
     name: "Fairy Ring",
@@ -70,6 +74,7 @@ const eventDefinitions = {
     hour: (_) => 0,
     minute: (minute) => 50 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.FOREST_RAINBOW]: {
     name: "Forest Brook Rainbow",
@@ -79,6 +84,7 @@ const eventDefinitions = {
     hour: (hour) => Math.abs(5 - hour) % 12,
     minute: (minute) => 0 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.DAILY_RESET]: {
     name: "Daily Reset",
@@ -97,6 +103,7 @@ const eventDefinitions = {
     hour: (hour) => hour % 4,
     minute: () => 0,
     isMonthly: true,
+    duration: 10,
     eventDay: 1,
   },
   [eventNames.CONCERT_GRABSEATS]: {
@@ -107,6 +114,7 @@ const eventDefinitions = {
     hour: (hour) => (2 + hour) % 4,
     minute: (minute) => 0 - minute,
     isMonthly: false,
+    duration: 10,
   },
   [eventNames.CONCERT_STARTS]: {
     name: "Concert Starts",
@@ -116,6 +124,7 @@ const eventDefinitions = {
     hour: (hour) => (2 + hour) % 4,
     minute: (minute) => 10 - minute,
     isMonthly: false,
+    duration: 30,
   },
 };
 
