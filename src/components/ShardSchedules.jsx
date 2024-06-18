@@ -109,30 +109,30 @@ const ShardSchedules = ({ date, title }) => {
                   <th className="p-2">Occurrence</th>
                   <th className="p-2 text-center">Land Time</th>
                   <th className="p-2 text-end">End Time</th>
+                  <th className="p-2 text-end">Next Shard</th>
                 </tr>
               </thead>
               <tbody className="font-thin text-base text-shadow-md">
                 {occurrences.map((occurrence, idx) => {
-                  const startTime = occurrence.start.setZone(localZone);
                   const endTime = occurrence.end.setZone(localZone);
                   const landTime = occurrence.land.setZone(localZone);
                   const totalDuration = endTime.diff(
-                    startTime,
+                    landTime,
                     "seconds"
                   ).seconds;
                   const elapsedDuration =
                     currentTime > endTime
                       ? totalDuration
-                      : currentTime < startTime
+                      : currentTime < landTime
                       ? 0
-                      : currentTime.diff(startTime, "seconds").seconds;
+                      : currentTime.diff(landTime, "seconds").seconds;
                   const progress = (elapsedDuration / totalDuration) * 100;
 
                   if (currentTime > endTime) {
                     return (
                       <tr key={idx}>
                         <td
-                          colSpan="3"
+                          colSpan="4"
                           className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
                         >
                           {"Shard " + (idx + 1)} Ended
@@ -151,6 +151,28 @@ const ShardSchedules = ({ date, title }) => {
                       </td>
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
                         {endTime.toLocaleString(DateTime.TIME_SIMPLE)}
+                      </td>
+                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                        {occurrences[idx].land < currentTime
+                          ? "Landed"
+                          : occurrences[idx].land.diffNow("hours").toObject()
+                              .hours >= 1
+                          ? `${Math.floor(
+                              occurrences[idx].land.diffNow("hours").toObject()
+                                .hours
+                            )} hours`
+                          : occurrences[idx].land.diffNow("minutes").toObject()
+                              .minutes >= 1
+                          ? `${Math.floor(
+                              occurrences[idx].land
+                                .diffNow("minutes")
+                                .toObject().minutes
+                            )} minutes`
+                          : `${Math.floor(
+                              occurrences[idx].land
+                                .diffNow("seconds")
+                                .toObject().seconds
+                            )} seconds`}
                       </td>
                       <div
                         className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
