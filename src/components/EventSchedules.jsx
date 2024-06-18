@@ -1,24 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getNextEvents } from "../services/events/eventsLogic";
-import { eventTypeNames, eventNames } from "../services/events/eventData";
+import { eventTypeNames } from "../services/events/eventData";
+import { monthNames } from "../utils/monthNames";
 
 const EventSchedules = () => {
   const [groupedEvents, setGroupedEvents] = useState({});
   const localTimeRef = useRef(null);
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
 
   useEffect(() => {
     const updateTime = () => {
@@ -34,6 +21,13 @@ const EventSchedules = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  function formatTime(hour, minute) {
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const adjustedHour = hour % 12 === 0 ? 12 : hour % 12;
+
+    return `${adjustedHour}:${String(minute).padStart(2, "0")} ${ampm}`;
+  }
 
   return (
     <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
@@ -67,22 +61,18 @@ const EventSchedules = () => {
                         {event.name}
                       </td>
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.key === eventNames.AVIARY_FIREWORKS &&
-                        !event.isAviaryEventDay ? (
+                        {event.isMonthly ? (
                           <>
                             {monthNames[event.date.getMonth()]}{" "}
                             {event.date.getDate()}{" "}
                           </>
                         ) : (
-                          <>
-                            {String(event.hour).padStart(2, "0")}:
-                            {String(event.minute).padStart(2, "0")}
-                          </>
+                          <>{formatTime(event.hour, event.minute)}</>
                         )}
                       </td>
+
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.key === eventNames.AVIARY_FIREWORKS &&
-                        !event.isAviaryEventDay ? (
+                        {event.isMonthly ? (
                           <>{event.daysOffset} days</>
                         ) : (
                           <>
