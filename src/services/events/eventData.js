@@ -33,6 +33,7 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 5 - minute,
+    isMonthly: false,
   },
   [eventNames.GRANDMA]: {
     name: "Grandma",
@@ -41,6 +42,7 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 35 - minute,
+    isMonthly: false,
   },
   [eventNames.TURTLE]: {
     name: "Turtle",
@@ -49,6 +51,7 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 50 - minute,
+    isMonthly: false,
   },
   [eventNames.SUNSET]: {
     name: "Sunset",
@@ -57,6 +60,7 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 50 - minute,
+    isMonthly: false,
   },
   [eventNames.FAIRY_RING]: {
     name: "Fairy Ring",
@@ -65,6 +69,7 @@ const eventDefinitions = {
     period: 60,
     hour: (_) => 0,
     minute: (minute) => 50 - minute,
+    isMonthly: false,
   },
   [eventNames.FOREST_RAINBOW]: {
     name: "Forest Brook Rainbow",
@@ -73,6 +78,7 @@ const eventDefinitions = {
     period: 12 * 60,
     hour: (hour) => Math.abs(5 - hour) % 12,
     minute: (minute) => 0 - minute,
+    isMonthly: false,
   },
   [eventNames.DAILY_RESET]: {
     name: "Daily Reset",
@@ -81,6 +87,7 @@ const eventDefinitions = {
     period: 24 * 60,
     hour: (hour) => 24 - hour,
     minute: (minute) => 0 - minute,
+    isMonthly: false,
   },
   [eventNames.AVIARY_FIREWORKS]: {
     name: "Aviary Fireworks",
@@ -89,6 +96,8 @@ const eventDefinitions = {
     period: 4 * 60,
     hour: (hour) => hour % 4,
     minute: () => 0,
+    isMonthly: true,
+    eventDay: 1,
   },
   [eventNames.CONCERT_GRABSEATS]: {
     name: "Grab Seats",
@@ -97,6 +106,7 @@ const eventDefinitions = {
     period: 4 * 60,
     hour: (hour) => (2 + hour) % 4,
     minute: (minute) => 0 - minute,
+    isMonthly: false,
   },
   [eventNames.CONCERT_STARTS]: {
     name: "Concert Starts",
@@ -105,6 +115,7 @@ const eventDefinitions = {
     period: 4 * 60,
     hour: (hour) => (2 + hour) % 4,
     minute: (minute) => 10 - minute,
+    isMonthly: false,
   },
 };
 
