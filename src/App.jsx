@@ -19,6 +19,22 @@ const ThemeToggle = () => {
 };
 
 const App = () => {
+  // America/Los_Angeles time zone for skyTime
+  const [skyTime, setSkyTime] = useState(
+    new Date().toLocaleTimeString("en-US", { timeZone: "America/Los_Angeles" })
+  );
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setSkyTime(
+        new Date().toLocaleTimeString("en-US", {
+          timeZone: "America/Los_Angeles",
+        })
+      );
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   const [currentTime, setCurrentTime] = useState(
     new Date().toLocaleTimeString()
   );
@@ -51,6 +67,12 @@ const App = () => {
                   className="text-lg md:text-2xl font-normal text-zinc-800 dark:text-zinc-200 ml-4 text-shadow-sm"
                 >
                   Local Time: {currentTime}
+                </h2>
+                <h2
+                  ref={localTimeRef}
+                  className="text-lg md:text-2xl font-normal text-zinc-800 dark:text-zinc-200 ml-4 text-shadow-sm"
+                >
+                  Sky Time: {skyTime}
                 </h2>
               </div>
               <ThemeToggle />
