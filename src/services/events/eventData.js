@@ -33,10 +33,6 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 5 - minute,
-    notification: {
-      body: "Geyser erupts in {t} minutes!",
-      image: "/images/events/geyser.jpg",
-    },
   },
   [eventNames.GRANDMA]: {
     name: "Grandma",
@@ -45,10 +41,6 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 35 - minute,
-    notification: {
-      body: "Grandma is visiting in {t} minutes!",
-      image: "/images/events/grandma.jpg",
-    },
   },
   [eventNames.TURTLE]: {
     name: "Turtle",
@@ -57,9 +49,6 @@ const eventDefinitions = {
     period: 120,
     hour: (hour) => hour % 2,
     minute: (minute) => 50 - minute,
-    notification: {
-      body: "Sanctuary turtle is visiting in {t} minutes!",
-    },
   },
   [eventNames.SUNSET]: {
     name: "Sunset",
@@ -100,15 +89,6 @@ const eventDefinitions = {
     period: 4 * 60,
     hour: (hour) => hour % 4,
     minute: () => 0,
-    notification: {
-      body: "Aviary Fireworks will start in {t} minutes!",
-    },
-    month: (day) => (day === 1 ? 0 : 1),
-    day: (date) => {
-      // Handle day and month logic
-      const day = date.getDate();
-      return day === 1 ? 0 : 1;
-    },
   },
   [eventNames.CONCERT_GRABSEATS]: {
     name: "Grab Seats",
@@ -129,9 +109,3 @@ const eventDefinitions = {
 };
 
 export { eventDefinitions };
-
-export const weeklyReset = {
-  period: 24 * 60,
-  hour: (hour) => 24 - hour,
-  minute: (minute) => 0 - minute,
-};

@@ -8,18 +8,18 @@ const DATE_PATTERN = "yyyy-MM-dd";
 function getTimeTokens(formattedTime) {
   const [hour, minute, second] = formattedTime.split(":");
   return {
-    hour: parseInt(hour),
-    minute: parseInt(minute),
-    second: parseInt(second),
+    hour: parseInt(hour, 10),
+    minute: parseInt(minute, 10),
+    second: parseInt(second, 10),
   };
 }
 
 function getDateTokens(formattedDate) {
   const [year, month, day] = formattedDate.split("-");
   return {
-    year: parseInt(year),
-    month: parseInt(month),
-    day: parseInt(day),
+    year: parseInt(year, 10),
+    month: parseInt(month, 10) - 1, // Month range is 0-11
+    day: parseInt(day, 10),
   };
 }
 

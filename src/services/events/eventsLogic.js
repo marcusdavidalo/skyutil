@@ -5,8 +5,7 @@ import { getEventOffset } from "./eventTimeOffset";
 export function getNextEvents(currentDate) {
   const groupedEvents = {};
 
-  Object.keys(eventDefinitions).forEach((eventKey) => {
-    const eventData = eventDefinitions[eventKey];
+  Object.values(eventDefinitions).forEach((eventData) => {
     const offset = getEventOffset(eventData, currentDate);
 
     const eventType = eventData.type;
@@ -20,9 +19,9 @@ export function getNextEvents(currentDate) {
     });
   });
 
-  // Sort events in each group
-  Object.keys(groupedEvents).forEach((type) => {
-    groupedEvents[type].sort(
+  // Sort events in each group by total seconds to next event
+  Object.values(groupedEvents).forEach((events) => {
+    events.sort(
       (a, b) => a.totalSecondsToNextEvent - b.totalSecondsToNextEvent
     );
   });

@@ -12,7 +12,7 @@ function getDaysToNextMonth(currentDate) {
   const day = currentDate.getDate();
 
   const daysInMonth = getDaysInMonth(year, month);
-  return daysInMonth - day; // Days remaining in this month
+  return daysInMonth - day + 1; // Days remaining in the current month (inclusive)
 }
 
 export function getMinutesToNextEvent(currentDate, eventData) {
@@ -24,7 +24,7 @@ export function getMinutesToNextEvent(currentDate, eventData) {
 
     if (!isEventDay) {
       const daysToNextMonth = getDaysToNextMonth(currentDate);
-      return (daysToNextMonth + 1) * 24 * 60;
+      return daysToNextMonth * 24 * 60;
     } else {
       const currentHour = currentDate.getHours();
       const nextEventHour = Math.ceil(currentHour / 4) * 4;
@@ -38,13 +38,9 @@ export function getMinutesToNextEvent(currentDate, eventData) {
   const minuteOffset = eventData.minute(minute);
   const secondOffset = eventData.second ? eventData.second(second) : 0;
 
-  if (eventData.period === 24 * 60) {
+  if (hourOffset >= 0) {
     return hourOffset * 60 + minuteOffset + secondOffset / 60;
-  } else if (hourOffset > 0) {
-    return (
-      eventData.period - (hourOffset * 60 - minuteOffset + secondOffset / 60)
-    );
-  } else if (minuteOffset > 0) {
+  } else if (minuteOffset >= 0) {
     return minuteOffset + secondOffset / 60;
   } else {
     return eventData.period - Math.abs(minuteOffset + secondOffset / 60);
@@ -67,7 +63,7 @@ export function getEventOffset(eventData, currentDate) {
   return {
     date: nextEventDate,
     minutesToNextEvent,
-    totalSecondsToNextEvent, // Added total seconds to next event for sorting
+    totalSecondsToNextEvent,
     daysOffset,
     hoursOffset,
     minutesOffset,
@@ -75,6 +71,6 @@ export function getEventOffset(eventData, currentDate) {
     hour,
     minute,
     second: 60 - second,
-    isAviaryEventDay: currentDate.getDate() === 1, // Flag for displaying day information
+    isAviaryEventDay: currentDate.getDate() === 1,
   };
 }

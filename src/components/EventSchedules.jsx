@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getNextEvents } from "../services/events/eventsLogic";
-import { eventTypeNames } from "../services/events/eventData";
+import { eventTypeNames, eventNames } from "../services/events/eventData";
 
 const EventSchedules = () => {
   const [groupedEvents, setGroupedEvents] = useState({});
@@ -30,16 +30,9 @@ const EventSchedules = () => {
       }
     };
 
-    const update = () => {
-      updateTime();
-      requestAnimationFrame(update);
-    };
+    const intervalId = setInterval(updateTime, 1000);
 
-    update();
-
-    return () => {
-      cancelAnimationFrame(update);
-    };
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -74,7 +67,7 @@ const EventSchedules = () => {
                         {event.name}
                       </td>
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.name === "Aviary Fireworks" &&
+                        {event.key === eventNames.AVIARY_FIREWORKS &&
                         !event.isAviaryEventDay ? (
                           <>
                             {monthNames[event.date.getMonth()]}{" "}
@@ -88,7 +81,7 @@ const EventSchedules = () => {
                         )}
                       </td>
                       <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {event.name === "Aviary Fireworks" &&
+                        {event.key === eventNames.AVIARY_FIREWORKS &&
                         !event.isAviaryEventDay ? (
                           <>{event.daysOffset} days</>
                         ) : (
