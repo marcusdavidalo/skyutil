@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getNextEvents } from "../services/events/eventsLogic";
 import { eventTypeNames } from "../services/events/eventData";
 import { DateTime } from "luxon";
+import { monthNames } from "../utils/monthNames";
 
 const EventSchedules = () => {
   const [groupedEvents, setGroupedEvents] = useState({});
@@ -34,6 +35,29 @@ const EventSchedules = () => {
 
   function calculateEventTimes(event) {
     const currentTime = DateTime.local();
+
+    if (event.isMonthly) {
+      let nextEventTime = currentTime.set({ day: event.eventDay });
+      if (
+        currentTime.day > event.eventDay ||
+        (currentTime.day === event.eventDay && currentTime.hour >= event.hour)
+      ) {
+        nextEventTime = nextEventTime.plus({ months: 1 });
+      }
+      nextEventTime = nextEventTime.set({
+        hour: event.hour,
+        minute: event.minute,
+        second: 0,
+      });
+
+      return {
+        currentTime,
+        startTime: nextEventTime,
+        endTime: nextEventTime.plus({ minutes: event.duration || 0 }),
+        nextEventTime,
+      };
+    }
+
     const startTime = DateTime.local().set({
       hour: event.hour,
       minute: event.minute,
@@ -59,6 +83,11 @@ const EventSchedules = () => {
   }
 
   function renderEventTime(currentTime, endTime, nextEventTime, event) {
+    if (event.isMonthly) {
+      const nextEventMonth = nextEventTime.month - 1; // Luxon months are 1-indexed
+      return `${monthNames[nextEventMonth]} ${nextEventTime.day}`;
+    }
+
     if (currentTime > endTime) {
       return nextEventTime.toLocaleString(DateTime.TIME_SIMPLE);
     }
