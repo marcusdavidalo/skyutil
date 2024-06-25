@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getNextEvents } from "../services/events/eventsLogic";
 import { eventTypeNames } from "../services/events/eventData";
-import { monthNames } from "../utils/monthNames";
-
 import { DateTime } from "luxon";
 
 const EventSchedules = () => {
@@ -34,6 +32,67 @@ const EventSchedules = () => {
     return `${startTimeString} - ${endTimeString}`;
   }
 
+  function calculateEventTimes(event) {
+    const currentTime = DateTime.local();
+    const startTime = DateTime.local().set({
+      hour: event.hour,
+      minute: event.minute,
+    });
+    const endTime = startTime.plus({ minutes: event.duration || 0 });
+    const nextEventTime =
+      currentTime > endTime
+        ? startTime.plus({ minutes: event.period })
+        : startTime;
+
+    return { currentTime, startTime, endTime, nextEventTime };
+  }
+
+  function calculateProgress(currentTime, startTime, endTime) {
+    const totalDuration = endTime.diff(startTime, "seconds").seconds;
+    const elapsedDuration =
+      currentTime < startTime
+        ? 0
+        : currentTime > endTime
+        ? totalDuration
+        : currentTime.diff(startTime, "seconds").seconds;
+    return (elapsedDuration / totalDuration) * 100;
+  }
+
+  function renderEventTime(currentTime, endTime, nextEventTime, event) {
+    if (currentTime > endTime) {
+      return nextEventTime.toLocaleString(DateTime.TIME_SIMPLE);
+    }
+    if (event.duration) {
+      return formatTime(event.hour, event.minute, event.duration);
+    }
+    return nextEventTime.toLocaleString(DateTime.TIME_SIMPLE);
+  }
+
+  function renderTimeToNext(event) {
+    if (event.isMonthly) {
+      return <>{event.daysOffset} days</>;
+    }
+    return (
+      <>
+        {event.hoursOffset}h {event.minutesOffset}m {event.second}s
+      </>
+    );
+  }
+
+  function renderProgressBar(event, currentTime, endTime, progress) {
+    if (event.duration && currentTime < endTime) {
+      return (
+        <div
+          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
+            progress < 100 ? "rounded-r-full" : ""
+          }`}
+          style={{ width: `${progress}%` }}
+        />
+      );
+    }
+    return null;
+  }
+
   return (
     <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8">
       <div className="flex justify-between items-center">
@@ -61,28 +120,13 @@ const EventSchedules = () => {
                 </thead>
                 <tbody className="font-thin text-base text-shadow-md">
                   {groupedEvents[type].map((event) => {
-                    const currentTime = DateTime.local();
-                    const startTime = DateTime.local().set({
-                      hour: event.hour,
-                      minute: event.minute,
-                    });
-                    const endTime = startTime.plus({
-                      minutes: event.duration || 0,
-                    });
-                    const nextEventTime =
-                      currentTime > endTime
-                        ? startTime.plus({ minutes: event.period })
-                        : null;
-
-                    const totalDuration = endTime.diff(
+                    const { currentTime, startTime, endTime, nextEventTime } =
+                      calculateEventTimes(event);
+                    const progress = calculateProgress(
+                      currentTime,
                       startTime,
-                      "seconds"
-                    ).seconds;
-                    const elapsedDuration =
-                      currentTime < startTime
-                        ? 0
-                        : currentTime.diff(startTime, "seconds").seconds;
-                    const progress = (elapsedDuration / totalDuration) * 100;
+                      endTime
+                    );
 
                     return (
                       <tr key={event.key} className="relative">
@@ -90,33 +134,21 @@ const EventSchedules = () => {
                           {event.name}
                         </td>
                         <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                          {currentTime > endTime && nextEventTime
-                            ? nextEventTime.toLocaleString(DateTime.TIME_SIMPLE)
-                            : event.duration
-                            ? formatTime(
-                                event.hour,
-                                event.minute,
-                                event.duration
-                              )
-                            : startTime.toLocaleString(DateTime.TIME_SIMPLE)}
-                        </td>
-                        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                          {event.isMonthly ? (
-                            <>{event.daysOffset} days</>
-                          ) : (
-                            <>
-                              {event.hoursOffset}h {event.minutesOffset}m{" "}
-                              {event.second}s
-                            </>
+                          {renderEventTime(
+                            currentTime,
+                            endTime,
+                            nextEventTime,
+                            event
                           )}
                         </td>
-                        {event.duration && currentTime < endTime && (
-                          <div
-                            className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
-                              progress < 100 ? "rounded-r-full" : ""
-                            }`}
-                            style={{ width: `${progress}%` }}
-                          />
+                        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+                          {renderTimeToNext(event)}
+                        </td>
+                        {renderProgressBar(
+                          event,
+                          currentTime,
+                          endTime,
+                          progress
                         )}
                       </tr>
                     );
