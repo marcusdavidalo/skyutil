@@ -39,7 +39,7 @@ const fullRealmNames = {
 const ShardSchedules = ({ date, title }) => {
   const [todayShardEvent, setTodayShardEvent] = useState({ hasShard: false });
   const [message, setMessage] = useState("");
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  // const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const localZone = Settings.defaultZoneName;
 
   useEffect(() => {
@@ -141,9 +141,9 @@ const ShardSchedules = ({ date, title }) => {
     );
   };
 
-  const goToFirstSlide = () => {
-    setCurrentSlideIndex(0);
-  };
+  // const goToFirstSlide = () => {
+  //   setCurrentSlideIndex(0);
+  // };
 
   if (!todayShardEvent.hasShard) {
     return (
@@ -167,12 +167,12 @@ const ShardSchedules = ({ date, title }) => {
         <h2 className="text-3xl font-bold mb-4 dark:text-white">
           Shard Schedule {title}
         </h2>
-        <button
+        {/* <button
           onClick={goToFirstSlide}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Go to First Slide
-        </button>
+        </button> */}
       </div>
       <div className="space-y-6">
         <div
