@@ -58,7 +58,7 @@ const ShardSchedules = ({ date, title }) => {
         })),
         timeZone: currentDate.zoneName,
       });
-      setMessage(null);
+      setMessage("");
     } else {
       setTodayShardEvent({
         hasShard: false,
@@ -74,23 +74,21 @@ const ShardSchedules = ({ date, title }) => {
 
   const formatNextShardTime = (occurrenceTime) => {
     const diff = occurrenceTime.diffNow();
-    if (diff.as("hours") >= 1) {
-      return `${Math.floor(diff.as("hours"))} ${
-        diff.as("hours") <= 1 ? "hour" : "hours"
-      }`;
-    } else if (diff.as("minutes") >= 1) {
-      return `${Math.floor(diff.as("minutes"))} ${
-        diff.as("minutes") <= 1 ? "minute" : "minutes"
-      }`;
-    } else {
-      return `${Math.floor(diff.as("seconds"))} ${
-        diff.as("seconds") <= 1 ? "second" : "seconds"
-      }`;
+    const hours = diff.as("hours");
+    const units = [
+      { value: hours, unit: "hour" },
+      { value: Math.floor(diff.as("minutes") / 60), unit: "minute" },
+      { value: Math.floor(diff.as("seconds") / 3600), unit: "second" },
+    ];
+
+    for (const { value, unit } of units) {
+      if (value >= 1) {
+        return `${Math.floor(value)} ${value === 1 ? unit : unit + "s"}`;
+      }
     }
   };
 
-  const renderOccurrenceRow = (occurrence, idx) => {
-    const currentTime = DateTime.local();
+  const calculateDurations = (occurrence, currentTime) => {
     const endTime = occurrence.end.setZone(localZone);
     const landTime = occurrence.land.setZone(localZone);
     const totalDuration = endTime.diff(landTime, "seconds").seconds;
@@ -102,17 +100,29 @@ const ShardSchedules = ({ date, title }) => {
         : currentTime.diff(landTime, "seconds").seconds;
     const progress = (elapsedDuration / totalDuration) * 100;
 
+    return { endTime, landTime, totalDuration, elapsedDuration, progress };
+  };
+
+  const renderEndedRow = (idx) => (
+    <tr key={idx}>
+      <td
+        colSpan="4"
+        className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
+      >
+        {"Shard " + (idx + 1)} Ended
+      </td>
+    </tr>
+  );
+
+  const renderOccurrenceRow = (occurrence, idx) => {
+    const currentTime = DateTime.local();
+    const { endTime, landTime, progress } = calculateDurations(
+      occurrence,
+      currentTime
+    );
+
     if (currentTime > endTime) {
-      return (
-        <tr key={idx}>
-          <td
-            colSpan="4"
-            className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
-          >
-            {"Shard " + (idx + 1)} Ended
-          </td>
-        </tr>
-      );
+      return renderEndedRow(idx);
     }
 
     return (
