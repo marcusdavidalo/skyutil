@@ -28,9 +28,18 @@ const mapLocation = (key) => {
   return locationMap[key] || key;
 };
 
+const fullRealmNames = {
+  prairie: "Daylight Prairie",
+  forest: "Hidden Forest",
+  valley: "Valley of Triumph",
+  wasteland: "Golden Wasteland",
+  vault: "Vault of Knowledge",
+};
+
 const ShardSchedules = ({ date, title }) => {
   const [todayShardEvent, setTodayShardEvent] = useState({ hasShard: false });
   const [message, setMessage] = useState("");
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const localZone = Settings.defaultZoneName;
 
   useEffect(() => {
@@ -60,6 +69,82 @@ const ShardSchedules = ({ date, title }) => {
     }
   }, [date, title]);
 
+  const getShardTypeClass = (isRed) =>
+    isRed ? "bg-red-600/20" : "bg-zinc-400/50 dark:bg-zinc-900/50";
+
+  const formatNextShardTime = (occurrenceTime) => {
+    const diff = occurrenceTime.diffNow();
+    if (diff.as("hours") >= 1) {
+      return `${Math.floor(diff.as("hours"))} ${
+        diff.as("hours") <= 1 ? "hour" : "hours"
+      }`;
+    } else if (diff.as("minutes") >= 1) {
+      return `${Math.floor(diff.as("minutes"))} ${
+        diff.as("minutes") <= 1 ? "minute" : "minutes"
+      }`;
+    } else {
+      return `${Math.floor(diff.as("seconds"))} ${
+        diff.as("seconds") <= 1 ? "second" : "seconds"
+      }`;
+    }
+  };
+
+  const renderOccurrenceRow = (occurrence, idx) => {
+    const currentTime = DateTime.local();
+    const endTime = occurrence.end.setZone(localZone);
+    const landTime = occurrence.land.setZone(localZone);
+    const totalDuration = endTime.diff(landTime, "seconds").seconds;
+    const elapsedDuration =
+      currentTime > endTime
+        ? totalDuration
+        : currentTime < landTime
+        ? 0
+        : currentTime.diff(landTime, "seconds").seconds;
+    const progress = (elapsedDuration / totalDuration) * 100;
+
+    if (currentTime > endTime) {
+      return (
+        <tr key={idx}>
+          <td
+            colSpan="4"
+            className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
+          >
+            {"Shard " + (idx + 1)} Ended
+          </td>
+        </tr>
+      );
+    }
+
+    return (
+      <tr key={idx} className="relative">
+        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+          {"Shard " + (idx + 1)}
+        </td>
+        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+          {landTime.toLocaleString(DateTime.TIME_SIMPLE)}
+        </td>
+        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+          {endTime.toLocaleString(DateTime.TIME_SIMPLE)}
+        </td>
+        <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
+          {occurrence.land < currentTime
+            ? "Landed"
+            : formatNextShardTime(occurrence.land)}
+        </td>
+        <div
+          className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
+            progress < 100 ? "rounded-r-full" : ""
+          }`}
+          style={{ width: `${progress}%` }}
+        />
+      </tr>
+    );
+  };
+
+  const goToFirstSlide = () => {
+    setCurrentSlideIndex(0);
+  };
+
   if (!todayShardEvent.hasShard) {
     return (
       <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8 h-full w-full">
@@ -73,32 +158,30 @@ const ShardSchedules = ({ date, title }) => {
 
   const { realm, map, occurrences, isRed } = todayShardEvent;
   const shardType = isRed ? "Red Shard" : "Black Shard";
-  const fullRealmName = {
-    prairie: "Daylight Prairie",
-    forest: "Hidden Forest",
-    valley: "Valley of Triumph",
-    wasteland: "Golden Wasteland",
-    vault: "Vault of Knowledge",
-  }[realm];
+  const fullRealmName = fullRealmNames[realm];
   const fullMapName = mapLocation(map);
 
-  const currentTime = DateTime.local();
-  const shardTypeClass = isRed
-    ? "bg-red-600/20"
-    : "bg-zinc-400/50 dark:bg-zinc-900/50";
   return (
     <div className="bg-zinc-100/50 dark:bg-zinc-900/50 rounded-lg shadow-md shadow-zinc-800/20 dark:shadow-zinc-200/10 p-4 md:p-6 lg:p-8 w-full">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold mb-4 dark:text-white">
           Shard Schedule {title}
         </h2>
+        <button
+          onClick={goToFirstSlide}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Go to First Slide
+        </button>
       </div>
       <div className="space-y-6">
         <div
           className={`bg-white/50 dark:bg-zinc-800/50 p-2 shadow-zinc-800/20 dark:shadow-zinc-200/20 shadow-md rounded-md w-full`}
         >
           <h3
-            className={`text-xl font-semibold mb-2 text-center p-2 rounded-md inset-2 shadow-inner shadow-zinc-800/20 dark:shadow-zinc-200/20 ${shardTypeClass}`}
+            className={`text-xl font-semibold mb-2 text-center p-2 rounded-md inset-2 shadow-inner shadow-zinc-800/20 dark:shadow-zinc-200/20 ${getShardTypeClass(
+              isRed
+            )}`}
           >
             {`${shardType} - ${fullRealmName} - ${fullMapName}`}
           </h3>
@@ -113,76 +196,9 @@ const ShardSchedules = ({ date, title }) => {
                 </tr>
               </thead>
               <tbody className="font-thin text-base text-shadow-md">
-                {occurrences.map((occurrence, idx) => {
-                  const endTime = occurrence.end.setZone(localZone);
-                  const landTime = occurrence.land.setZone(localZone);
-                  const totalDuration = endTime.diff(
-                    landTime,
-                    "seconds"
-                  ).seconds;
-                  const elapsedDuration =
-                    currentTime > endTime
-                      ? totalDuration
-                      : currentTime < landTime
-                      ? 0
-                      : currentTime.diff(landTime, "seconds").seconds;
-                  const progress = (elapsedDuration / totalDuration) * 100;
-
-                  if (currentTime > endTime) {
-                    return (
-                      <tr key={idx}>
-                        <td
-                          colSpan="4"
-                          className="p-2 text-center bg-red-600/20 text-zinc-800 dark:text-zinc-200 font-semibold"
-                        >
-                          {"Shard " + (idx + 1)} Ended
-                        </td>
-                      </tr>
-                    );
-                  }
-
-                  return (
-                    <tr key={idx} className="relative">
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {"Shard " + (idx + 1)}
-                      </td>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {landTime.toLocaleString(DateTime.TIME_SIMPLE)}
-                      </td>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {endTime.toLocaleString(DateTime.TIME_SIMPLE)}
-                      </td>
-                      <td className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-                        {occurrences[idx].land < currentTime
-                          ? "Landed"
-                          : occurrences[idx].land.diffNow("hours").toObject()
-                              .hours >= 1
-                          ? `${Math.floor(
-                              occurrences[idx].land.diffNow("hours").toObject()
-                                .hours
-                            )} hours`
-                          : occurrences[idx].land.diffNow("minutes").toObject()
-                              .minutes >= 1
-                          ? `${Math.floor(
-                              occurrences[idx].land
-                                .diffNow("minutes")
-                                .toObject().minutes
-                            )} minutes`
-                          : `${Math.floor(
-                              occurrences[idx].land
-                                .diffNow("seconds")
-                                .toObject().seconds
-                            )} seconds`}
-                      </td>
-                      <div
-                        className={`absolute left-0 top-0 h-full bg-gradient-to-r from-green-500/10 from-30% via-zinc-800/10 via-50% to-red-600/20 text-end ${
-                          progress < 100 ? "rounded-r-full" : ""
-                        }`}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </tr>
-                  );
-                })}
+                {occurrences.map((occurrence, idx) =>
+                  renderOccurrenceRow(occurrence, idx)
+                )}
               </tbody>
             </table>
           </div>
